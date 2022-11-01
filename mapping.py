@@ -77,6 +77,22 @@ class QueryAPI:
 
         logging.error(f"Couldn't retrieve status correctly")
 
+    @staticmethod
+    def _compute_freq_available(row):
+        """
+        Computing the frequency of available bikes in a station (whatever their type)
+        :param row:
+        :return:
+        """
+        cols = ['NUM_DOCKS_AVAILABLE', 'NUM_MECHANICAL', 'NUM_E_BIKES']
+        x = sum([row.__getattr__(col) for col in cols])
+
+        if not x:
+            return None
+
+        f = row.NUM_DOCKS_AVAILABLE / x
+        return round(f, 4)
+
     def get_data(self):
         """
         'Main' method to call to retrieve data about the stations themselves and their respective status information
@@ -90,6 +106,9 @@ class QueryAPI:
 
         # Merging both dataframes to get the most exhaustive data we can
         data = pd.merge(stations_status_df, locations_df, on='STATION_ID')
+
+        # Adding the frequency of available docks
+        data['FREQUENCY_AVAILABLE_DOCKS'] = data.apply(lambda row: QueryAPI._compute_freq_available(row), axis=1)
 
         # Ordering by station name
         data.sort_values(by='NAME', inplace=True)
