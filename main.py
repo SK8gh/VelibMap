@@ -12,8 +12,6 @@ if __name__ == '__main__':
     run_time = time.time()
     logging.info(f"{datetime.now()} : Running...")
 
-    time.sleep(4000)
-
     # Getting the data
     data = QueryAPI().get_data()
 
